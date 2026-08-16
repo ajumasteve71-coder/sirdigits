@@ -1,1 +1,1 @@
-{"styles":{"buy":"a","tick":"c","stake":"b","symbol":"a","duration":"c","tradeType":"a","digitStats":"b","prediction":"b","contractMode":"a"},"order":["tradeType","symbol","tick","digitStats","contractMode","stake","duration","prediction","buy"]}
+{"styles":{"buy":"a","tick":"c","stake":"c","symbol":"b","duration":"c","tradeType":"a","digitStats":"b","prediction":"b","contractMode":"c"},"order":["tradeType","symbol","tick","digitStats","contractMode","stake","duration","prediction","buy"]}
