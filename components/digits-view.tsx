@@ -4,15 +4,16 @@ import { useMemo } from 'react';
 import { Ban } from 'lucide-react';
 import { Localize } from '@deriv-com/translations';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Footer } from '@/components/custom/footer';
+import { Footer, FooterBar } from '@/components/custom/footer';
 import { Header } from '@/components/custom/header';
+import { PinnedBuyBar } from '@/components/custom/pinned-buy-bar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 import { useAppTranslations } from '@/components/custom/i18n-provider';
 import { CurrentTickDisplay } from './current-tick-display';
 import { DigitStatsBar } from './digit-stats-bar';
 import { TradeControls } from './trade-controls';
-import { ConfigurableDigitsControls } from './configurable-digits-controls';
+import { ConfigurableDigitsControls, ConfigurableBuyButton } from './configurable-digits-controls';
 import { TradeTypeChips } from '@/components/custom/trade-type-chips';
 import { SymbolSelector } from '@/components/custom/symbol-selector';
 import { ThemeToggle } from '@/components/custom/theme-toggle';
@@ -151,6 +152,26 @@ export function DigitsView({
   onReorder,
 }: DigitsViewProps) {
   const isMobile = useIsMobile();
+  // Pinning is a mobile affordance: on desktop the controls card grows to fit,
+  // so the Buy button is never scroll-clipped and a viewport-wide bar under a
+  // 400px column would look detached.
+  const pinBuy = !!appConfig?.buy?.pinned && isMobile;
+  // With Buy unpinned the footer still has to sit at the end of the mobile
+  // column — and a `fixed` footer makes that column reserve clearance for it.
+  // That reservation was a guess (`pb-28`, 112px) for a footer that measures
+  // 40px, leaving 72px of dead space under the Buy button at the bottom of the
+  // scroll. Rendering it in flow, exactly as PinnedBuyBar does, ends the column
+  // where the footer begins and removes the number to guess.
+  //
+  // Note what this does NOT depend on: `buy.pinned`. Every no-code mobile
+  // render gets the in-flow band, so an existing unpinned project also moves
+  // off the translucent `fixed` footer on its next redeploy. That is deliberate
+  // — it is the dead-space fix — but it means the backward-compatibility rule
+  // covers Buy's PLACEMENT, not the footer treatment: a pre-existing project
+  // keeps Buy scrolling in the column, while its footer becomes the opaque
+  // bordered band. A footer that moved after a redeploy is expected here, not a
+  // regression.
+  const inFlowFooter = !!appConfig && isMobile;
   const { localize } = useAppTranslations();
   const digitTradeTypeOptions = getDigitTradeTypeOptions(localize);
 
@@ -242,6 +263,7 @@ export function DigitsView({
         selectedKey={selectedKey}
         rearrangeMode={rearrangeMode}
         onReorder={onReorder}
+        pinBuy={pinBuy}
       />
     ) : null;
 
@@ -274,7 +296,7 @@ export function DigitsView({
         isMobile ? (
           /* No-code mobile layout: a single, reorderable column of blocks. */
           <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
-            <div className="mx-auto flex w-full max-w-md flex-col gap-3 px-3 py-3 pb-28">
+            <div className="mx-auto flex w-full max-w-md flex-col gap-3 px-3 py-3">
               {isLoading ? <Skeleton className="h-[420px] w-full rounded-xl" /> : renderConfigurable()}
             </div>
           </div>
@@ -382,10 +404,35 @@ export function DigitsView({
         </div>
       )}
 
-      {/* Fixed footer */}
-      <div className="fixed bottom-0 left-0 right-0 py-2 text-center bg-background/80 backdrop-blur-sm">
-        <Footer />
-      </div>
+      {pinBuy ? (
+        <PinnedBuyBar
+          editMode={editMode}
+          rearrangeMode={rearrangeMode}
+          selected={selectedKey === 'buy'}
+          onSelect={() => onSelect?.('buy')}
+          label={localize('Buy button')}
+        >
+          <ConfigurableBuyButton
+            variant={appConfig!.styles.buy}
+            isConnected={isConnected}
+            proposal={proposal}
+            onBuy={buyContract}
+            isBuying={isBuying}
+          />
+        </PinnedBuyBar>
+      ) : inFlowFooter ? (
+        /* Unpinned mobile: the same band the pinned bar ends in, minus the Buy
+           button — in flow at the end of the h-dvh column, so the scroll area
+           ends where it begins and nothing reserves clearance for it. Sharing
+           the band is what keeps the footer from moving when the pin toggles. */
+        <FooterBar />
+      ) : (
+        /* Fixed footer — desktop and the standard layout, which scroll the
+           document rather than an inner column. */
+        <div className="fixed bottom-0 left-0 right-0 py-2 text-center bg-background/80 backdrop-blur-sm">
+          <Footer />
+        </div>
+      )}
     </main>
   );
 }

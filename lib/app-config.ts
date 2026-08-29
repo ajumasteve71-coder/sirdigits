@@ -45,6 +45,15 @@ export interface DigitsAppConfig {
   };
   /** Top-to-bottom order of layout blocks. */
   order: ControlKey[];
+  /**
+   * Buy button options. `pinned` lifts the Buy button out of the scrolling
+   * column into a bar at the bottom of the mobile layout, directly above the
+   * footer. Desktop is unaffected — its controls card grows to fit, so the Buy
+   * button is never scrolled out of reach there.
+   */
+  buy: {
+    pinned: boolean;
+  };
 }
 
 /** All control keys, in default order. */
@@ -73,6 +82,7 @@ export const DEFAULT_APP_CONFIG: DigitsAppConfig = {
     buy: 'a',
   },
   order: [...ALL_CONTROL_KEYS],
+  buy: { pinned: true },
 };
 
 /** Validate + normalise an arbitrary value into a safe DigitsAppConfig. */
@@ -93,5 +103,7 @@ export function normalizeAppConfig(value: unknown): DigitsAppConfig {
     buy: pickVariant('buy'),
   };
   const order = normalizeBlockOrder(raw.order, ALL_CONTROL_KEYS);
-  return { styles, order };
+  // A stored config with no `buy` key predates the pin option: keep that app
+  // unpinned rather than adopting the new default on its owner's behalf.
+  return { styles, order, buy: { pinned: !!raw.buy?.pinned } };
 }

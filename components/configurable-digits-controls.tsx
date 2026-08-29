@@ -123,6 +123,73 @@ function showDigitInPrediction(contractMode: ContractMode): boolean {
   return contractMode !== 'DIGITEVEN' && contractMode !== 'DIGITODD';
 }
 
+/**
+ * The Buy button, in its three configurable styles.
+ *
+ * Exported because the button has two homes: inline in the reorderable column
+ * (the default), or lifted into the pinned bottom bar when `buy.pinned` is on —
+ * and that bar is owned by the view, not by this component. One implementation
+ * means the pinned button stays style-for-style identical to the inline one.
+ */
+export interface ConfigurableBuyButtonProps {
+  variant: StyleVariant;
+  isConnected: boolean;
+  proposal: ProposalInfo | null;
+  onBuy: () => void;
+  isBuying: boolean;
+}
+
+export function ConfigurableBuyButton({
+  variant,
+  isConnected,
+  proposal,
+  onBuy,
+  isBuying,
+}: ConfigurableBuyButtonProps) {
+  const { localize } = useAppTranslations();
+
+  const disabled = !isConnected || !proposal || isBuying;
+  const label = isBuying
+    ? localize('Purchasing...')
+    : proposal
+      ? localize('Buy @ {{price}} USD', { price: proposal.askPrice.toFixed(2) })
+      : localize('Buy Contract');
+
+  const variants: Record<StyleVariant, () => React.ReactNode> = {
+    // a — pill (current)
+    a: () => (
+      <Button
+        className="h-10 w-full rounded-full px-6 sm:h-11 sm:px-8"
+        disabled={disabled}
+        onClick={onBuy}
+      >
+        {label}
+      </Button>
+    ),
+    // Block — squared, bold.
+    b: () => (
+      <Button
+        className="h-14 w-full rounded-md bg-primary text-base font-bold text-primary-foreground hover:bg-primary/90"
+        disabled={disabled}
+        onClick={onBuy}
+      >
+        {label}
+      </Button>
+    ),
+    // Gradient background.
+    c: () => (
+      <Button
+        className="h-14 w-full rounded-xl bg-gradient-to-r from-primary to-primary/70 font-semibold text-primary-foreground shadow-lg shadow-primary/20 hover:opacity-90"
+        disabled={disabled}
+        onClick={onBuy}
+      >
+        {label}
+      </Button>
+    ),
+  };
+  return (variants[variant] ?? variants.a)();
+}
+
 export interface ConfigurableDigitsControlsProps {
   config: DigitsAppConfig;
 
@@ -167,6 +234,12 @@ export interface ConfigurableDigitsControlsProps {
   rearrangeMode?: boolean;
   /** Called with the new block order after a drag-drop reorder. */
   onReorder?: (order: ControlKey[]) => void;
+  /**
+   * Buy is pinned to the bottom bar, which the view owns — so skip it here
+   * rather than rendering it inline. Also keeps it out of rearrange mode: a
+   * pinned button has no position to drag.
+   */
+  pinBuy?: boolean;
 }
 
 export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProps) {
@@ -204,6 +277,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
     selectedKey,
     rearrangeMode,
     onReorder,
+    pinBuy,
   } = props;
 
   const { localize } = useAppTranslations();
@@ -810,49 +884,19 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
   };
 
   // ── Buy (3 styles, themed) ──────────────────────────────────────────────
-  // Real control = the <Button>.
-  const renderBuy = () => {
-    const disabled = !isConnected || !proposal || isBuying;
-    const label = isBuying
-      ? localize('Purchasing...')
-      : proposal
-        ? localize('Buy @ {{price}} USD', { price: proposal.askPrice.toFixed(2) })
-        : localize('Buy Contract');
-
-    const variants: Record<StyleVariant, () => React.ReactNode> = {
-      // a — pill (current)
-      a: () => (
-        <Button
-          className="h-10 w-full rounded-full px-6 sm:h-11 sm:px-8"
-          disabled={disabled}
-          onClick={onBuy}
-        >
-          {label}
-        </Button>
-      ),
-      // Block — squared, bold.
-      b: () => (
-        <Button
-          className="h-14 w-full rounded-md bg-primary text-base font-bold text-primary-foreground hover:bg-primary/90"
-          disabled={disabled}
-          onClick={onBuy}
-        >
-          {label}
-        </Button>
-      ),
-      // Gradient background.
-      c: () => (
-        <Button
-          className="h-14 w-full rounded-xl bg-gradient-to-r from-primary to-primary/70 font-semibold text-primary-foreground shadow-lg shadow-primary/20 hover:opacity-90"
-          disabled={disabled}
-          onClick={onBuy}
-        >
-          {label}
-        </Button>
-      ),
-    };
-    return (variants[config.styles.buy] ?? variants.a)();
-  };
+  // Real control = the <Button>. Returns null when the Buy button is pinned:
+  // the view renders it in the bottom bar, and every block loop below skips a
+  // renderer that returns null.
+  const renderBuy = () =>
+    pinBuy ? null : (
+      <ConfigurableBuyButton
+        variant={config.styles.buy}
+        isConnected={isConnected}
+        proposal={proposal}
+        onBuy={onBuy}
+        isBuying={isBuying}
+      />
+    );
 
   const renderers: Record<ControlKey, () => React.ReactNode> = {
     tradeType: renderTradeType,
@@ -900,7 +944,12 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
                 {blockLabels[key]}
               </div>
               <div className="absolute inset-0 z-[60]" />
-              <div className="pointer-events-none select-none px-2 pb-2 pt-9">{content}</div>
+              <div
+                inert={editMode || undefined}
+                className="pointer-events-none select-none px-2 pb-2 pt-9"
+              >
+                {content}
+              </div>
             </div>
           );
         })}
@@ -935,7 +984,16 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
                   selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
                 ].join(' ')}
               />
-              <div className="pointer-events-none">{content}</div>
+              {/* `inert`, not just pointer-events-none: that only removes the
+                  subtree from POINTER hit-testing, so the real Buy <button>
+                  inside keeps tabIndex 0 and Enter/Space still fires its
+                  onClick — and /edit is the live app on a real account. The
+                  pinned bar got this in 9804954; the column needs it for the
+                  same reason. The row <button> around this stays interactive,
+                  so selecting the block still works. */}
+              <div inert={editMode || undefined} className="pointer-events-none">
+                {content}
+              </div>
             </button>
           );
         })}
