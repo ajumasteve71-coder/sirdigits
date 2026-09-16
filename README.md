@@ -2,6 +2,23 @@
 
 A self-hosted digit trading app built on the Deriv WebSocket API. Supports Matches/Differs, Over/Under, and Even/Odd contract types with real-time tick streaming and digit frequency statistics.
 
+## Landing page
+
+`landing/` is a standalone static marketing site (plain HTML + compiled Tailwind CSS, no build step at deploy time). It is the artifact Netlify publishes, configured by the `[build] publish = "landing"` block in `netlify.toml`.
+
+- `landing/index.html` — the page
+- `landing/assets/styles.css` — compiled Tailwind output (committed)
+- `landing/assets/app.js` — theme toggle, mobile nav, scroll reveals, animated digit preview
+
+To regenerate the stylesheet after editing markup:
+
+```bash
+cd landing
+../node_modules/.bin/tailwindcss -c tailwind.config.js -i src/input.css -o assets/styles.css --minify
+```
+
+The Next.js app below remains the source for the trading interface and is developed with `npm run dev`.
+
 ## Prerequisites
 
 - Node.js 18.18 or later
