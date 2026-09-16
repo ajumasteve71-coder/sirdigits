@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SirDigits — Trade the last digit with confidence</title>
+    <meta
+      name="description"
+      content="SirDigits is a fast, white-label digit trading platform powered by Deriv. Predict the last digit across Matches/Differs, Over/Under and Even/Odd markets with real-time tick feeds and live digit statistics."
+    />
+    <meta name="theme-color" content="#108b0e" />
+    <link rel="canonical" href="https://sirdigits.netlify.app/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="SirDigits — Trade the last digit with confidence" />
+    <meta
+      property="og:description"
+      content="Real-time digit trading built on the Deriv WebSocket API. Matches/Differs, Over/Under and Even/Odd with live tick streaming."
+    />
+    <meta property="og:url" content="https://sirdigits.netlify.app/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23108b0e'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='17' font-family='sans-serif' font-weight='bold'%3ES%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme');
+          var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.classList.toggle('dark', dark);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="font-sans">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-brand-500 focus:px-5 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+      >Skip to content</a
+    >
+
+    <!-- ================= Header ================= -->
+    <header
+      id="site-header"
+      class="fixed inset-x-0 top-0 z-50 transition-all duration-300"
+    >
+      <div class="container-x">
+        <div
+          id="header-inner"
+          class="mt-3 flex items-center justify-between rounded-2xl border border-transparent px-4 py-2.5 transition-all duration-300 sm:px-5"
+        >
+          <a href="#" class="flex items-center gap-2.5" aria-label="SirDigits home">
+            <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand-500 text-white shadow-md shadow-brand-500/30">
+              <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" aria-hidden="true">
+                <path d="M4 7h16M4 12h10M4 17h13" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              </svg>
+            </span>
+            <span class="text-lg font-extrabold tracking-tight">Sir<span class="text-brand-500">Digits</span></span>
+          </a>
+
+          <nav class="hidden items-center gap-1 lg:flex" aria-label="Primary">
+            <a class="nav-link" href="#platform">Platform</a>
+            <a class="nav-link" href="#contracts">Contracts</a>
+            <a class="nav-link" href="#how">How it works</a>
+            <a class="nav-link" href="#faq">FAQ</a>
+          </nav>
+
+          <div class="flex items-center gap-2">
+            <button
+              id="theme-toggle"
+              type="button"
+              class="grid h-9 w-9 place-items-center rounded-full border border-neutral-200 text-neutral-600 transition-colors hover:text-neutral-950 dark:border-white/15 dark:text-neutral-300 dark:hover:text-white"
+              aria-label="Toggle color theme"
+            >
+              <svg class="h-4 w-4 dark:hidden" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+              </svg>
+              <svg class="hidden h-4 w-4 dark:block" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2" />
+                <path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              </svg>
+            </button>
+            <a href="https://app.deriv.com" class="btn-ghost hidden sm:inline-flex">Log in</a>
+            <a href="https://t.deriv.link?t=SJDWRRPSERHY" class="btn-primary px-4 py-2.5 text-[13px]">Get started</a>
+            <button
+              id="menu-toggle"
+              type="button"
+              class="grid h-9 w-9 place-items-center rounded-full border border-neutral-200 text-neutral-700 lg:hidden dark:border-white/15 dark:text-neutral-200"
+              aria-label="Open menu"
+              aria-expanded="false"
+              aria-controls="mobile-menu"
+            >
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div
+          id="mobile-menu"
+          class="hidden overflow-hidden rounded-2xl border border-neutral-200 bg-white/95 p-3 shadow-lift backdrop-blur lg:hidden dark:border-white/10 dark:bg-night-800/95"
+        >
+          <a class="block rounded-xl px-4 py-3 text-sm font-medium hover:bg-neutral-100 dark:hover:bg-white/5" href="#platform">Platform</a>
+          <a class="block rounded-xl px-4 py-3 text-sm font-medium hover:bg-neutral-100 dark:hover:bg-white/5" href="#contracts">Contracts</a>
+          <a class="block rounded-xl px-4 py-3 text-sm font-medium hover:bg-neutral-100 dark:hover:bg-white/5" href="#how">How it works</a>
+          <a class="block rounded-xl px-4 py-3 text-sm font-medium hover:bg-neutral-100 dark:hover:bg-white/5" href="#faq">FAQ</a>
+          <a class="mt-1 block rounded-xl px-4 py-3 text-sm font-semibold text-brand-600 hover:bg-brand-500/10 dark:text-brand-300" href="https://app.deriv.com">Log in</a>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- ================= Hero ================= -->
+      <section class="relative overflow-hidden pb-16 pt-32 sm:pb-24 sm:pt-40">
+        <div
+          class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_0%,rgba(16,139,14,.16),transparent_70%)] dark:bg-[radial-gradient(60%_50%_at_50%_0%,rgba(16,139,14,.28),transparent_70%)]"
+          aria-hidden="true"
+        ></div>
+        <div
+          class="pointer-events-none absolute -left-32 top-40 -z-10 h-72 w-72 rounded-full bg-brand-400/20 blur-3xl dark:bg-brand-500/20"
+          aria-hidden="true"
+        ></div>
+
+        <div class="container-x grid items-center gap-14 lg:grid-cols-[1.05fr_1fr] lg:gap-10">
+          <div>
+            <span class="eyebrow" data-reveal>
+              <span class="relative flex h-2 w-2">
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-75"></span>
+                <span class="relative inline-flex h-2 w-2 rounded-full bg-brand-500"></span>
+              </span>
+              Powered by Deriv · Real-time tick feeds
+            </span>
+
+            <h1 class="mt-6 text-balance text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl" data-reveal>
+              Trade the last digit with <span class="gradient-text">total clarity</span>.
+            </h1>
+
+            <p class="muted mt-6 max-w-xl text-lg leading-relaxed" data-reveal>
+              SirDigits turns raw market ticks into a focused, lightning-fast digits trading
+              experience. Read live frequency data, choose your contract, and act in seconds —
+              all in your browser, on any device.
+            </p>
+
+            <div class="mt-8 flex flex-wrap items-center gap-3" data-reveal>
+              <a href="https://t.deriv.link?t=SJDWRRPSERHY" class="btn-primary px-6 py-3.5 text-base">
+                Start trading free
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </a>
+              <a href="#platform" class="btn-outline px-6 py-3.5 text-base">See the platform</a>
+            </div>
+
+            <dl class="mt-12 grid max-w-lg grid-cols-3 gap-6" data-reveal>
+              <div>
+                <dt class="text-2xl font-extrabold tracking-tight sm:text-3xl">3</dt>
+                <dd class="muted mt-1 text-sm">Contract families</dd>
+              </div>
+              <div>
+                <dt class="text-2xl font-extrabold tracking-tight sm:text-3xl">10</dt>
+                <dd class="muted mt-1 text-sm">Digits tracked live</dd>
+              </div>
+              <div>
+                <dt class="text-2xl font-extrabold tracking-tight sm:text-3xl">24/7</dt>
+                <dd class="muted mt-1 text-sm">Synthetic markets</dd>
+              </div>
+            </dl>
+          </div>
+
+          <!-- Live preview card -->
+          <div class="relative" data-reveal>
+            <div class="absolute -inset-4 -z-10 rounded-[2rem] bg-gradient-to-br from-brand-500/20 via-transparent to-emerald-400/20 blur-2xl" aria-hidden="true"></div>
+            <div class="card overflow-hidden shadow-lift">
+              <div class="flex items-center justify-between border-b border-neutral-200 px-5 py-4 dark:border-white/10">
+                <div class="flex items-center gap-2.5">
+                  <span class="grid h-9 w-9 place-items-center rounded-lg bg-brand-500/10 text-brand-600 dark:text-brand-300">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M3 17l5-6 4 3 6-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M21 6v5h-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </span>
+                  <div>
+                    <p class="text-sm font-semibold">Volatility 100 (1s) Index</p>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Synthetic · ticks every 1s</p>
+                  </div>
+                </div>
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-buy/10 px-2.5 py-1 text-xs font-semibold text-buy">
+                  <span class="h-1.5 w-1.5 rounded-full bg-buy"></span> Live
+                </span>
+              </div>
+
+              <div class="grid grid-cols-2 divide-x divide-neutral-200 border-b border-neutral-200 dark:divide-white/10 dark:border-white/10">
+                <div class="p-5">
+                  <p class="text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Current price</p>
+                  <p id="tick-price" class="mt-2 font-mono text-2xl font-bold tabular-nums">1,243.657</p>
+                </div>
+                <div class="flex flex-col items-center justify-center p-5">
+                  <p class="text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Last digit</p>
+                  <div
+                    id="tick-digit"
+                    class="mt-2 grid h-12 w-12 animate-pulseRing place-items-center rounded-xl bg-brand-500 font-mono text-2xl font-extrabold text-white"
+                  >
+                    7
+                  </div>
+                </div>
+              </div>
+
+              <div class="p-5">
+                <div class="mb-3 flex items-center justify-between">
+                  <p class="text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Digit frequency</p>
+                  <p class="text-xs text-neutral-500 dark:text-neutral-400">last 1,000 ticks</p>
+                </div>
+                <div id="digit-bars" class="grid grid-cols-10 items-end gap-1.5" aria-hidden="true"></div>
+              </div>
+
+              <div class="border-t border-neutral-200 p-5 dark:border-white/10">
+                <div class="mb-3 flex items-center justify-between">
+                  <p class="text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Recent digits</p>
+                  <p class="text-xs text-neutral-500 dark:text-neutral-400">newest →</p>
+                </div>
+                <div id="digit-history" class="flex gap-1.5 overflow-hidden"></div>
+                <p class="mt-4 text-[11px] leading-relaxed text-neutral-400 dark:text-neutral-500">
+                  Simulated preview for illustration only. Not live market data or financial advice.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= Trust strip ================= -->
+      <div class="hairline">
+        <div class="container-x py-8">
+          <p class="text-center text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400 dark:text-neutral-500">
+            Built on the Deriv WebSocket API
+          </p>
+          <div class="mask-fade-x mt-6 overflow-hidden">
+            <div class="flex w-max animate-marquee">
+              <div class="flex shrink-0 items-center gap-12 pr-12">
+                <span class="whitespace-nowrap text-base font-semibold text-neutral-400 dark:text-neutral-600">Volatility Indices</span>
+                <span class="whitespace-nowrap text-base font-semibold text-neutral-400 dark:text-neutral-600">Matches / Differs</span>
+                <span class="whitespace-nowrap text-base font-semibold text-neutral-400 dark:text-neutral-600">Over / Under</span>
+                <span class="whitespace-nowrap text-base font-semibold text-neutral-400 dark:text-neutral-600">Even / Odd</span>
+                <span class="whitespace-nowrap text-base font-semibold text-neutral-400 dark:text-neutral-600">Real-time ticks</span>
+              </div>
+              <div class="flex shrink-0 items-center gap-12 pr-12" aria-hidden="true">
+                <span class="whitespace-nowrap text-base font-semibold text-neutral-400 dark:text-neutral-600">Volatility Indices</span>
+                <span class="whitespace-nowrap text-base font-semibold text-neutral-400 dark:text-neutral-600">Matches / Differs</span>
+                <span class="whitespace-nowrap text-base font-semibold text-neutral-400 dark:text-neutral-600">Over / Under</span>
+                <span class="whitespace-nowrap text-base font-semibold text-neutral-400 dark:text-neutral-600">Even / Odd</span>
+                <span class="whitespace-nowrap text-base font-semibold text-neutral-400 dark:text-neutral-600">Real-time ticks</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= Platform / Features ================= -->
+      <section id="platform" class="section">
+        <div class="container-x">
+          <div class="max-w-2xl">
+            <span class="eyebrow" data-reveal>The platform</span>
+            <h2 class="section-title mt-5" data-reveal>Everything you need to trade digits, nothing you don't.</h2>
+            <p class="muted mt-5 text-lg leading-relaxed" data-reveal>
+              A deliberately lean interface keeps the focus on the data that matters. Every
+              stream updates the moment a new tick lands.
+            </p>
+          </div>
+
+          <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <article class="card-hover p-7" data-reveal>
+              <span class="grid h-11 w-11 place-items-center rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-300">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <h3 class="mt-5 text-lg font-bold">Real-time tick streaming</h3>
+              <p class="muted mt-2 text-sm leading-relaxed">A persistent WebSocket feed pushes every tick instantly — no polling, no stale prices.</p>
+            </article>
+
+            <article class="card-hover p-7" data-reveal>
+              <span class="grid h-11 w-11 place-items-center rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-300">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="7" height="18" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="14" y="8" width="7" height="13" rx="1.5" stroke="currentColor" stroke-width="2"/></svg>
+              </span>
+              <h3 class="mt-5 text-lg font-bold">Live digit statistics</h3>
+              <p class="muted mt-2 text-sm leading-relaxed">See how often each digit has appeared across the last 1,000 ticks and spot streaks at a glance.</p>
+            </article>
+
+            <article class="card-hover p-7" data-reveal>
+              <span class="grid h-11 w-11 place-items-center rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-300">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <h3 class="mt-5 text-lg font-bold">Three contract families</h3>
+              <p class="muted mt-2 text-sm leading-relaxed">Matches/Differs, Over/Under and Even/Odd — switch contract types without leaving the page.</p>
+            </article>
+
+            <article class="card-hover p-7" data-reveal>
+              <span class="grid h-11 w-11 place-items-center rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-300">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <h3 class="mt-5 text-lg font-bold">Secure OAuth sign-in</h3>
+              <p class="muted mt-2 text-sm leading-relaxed">Authenticate through Deriv's official OAuth flow. Your credentials never touch the app.</p>
+            </article>
+
+            <article class="card-hover p-7" data-reveal>
+              <span class="grid h-11 w-11 place-items-center rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-300">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 20h8M12 16v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </span>
+              <h3 class="mt-5 text-lg font-bold">Responsive by design</h3>
+              <p class="muted mt-2 text-sm leading-relaxed">One clean layout that adapts from a phone in your pocket to a widescreen trading desk.</p>
+            </article>
+
+            <article class="card-hover p-7" data-reveal>
+              <span class="grid h-11 w-11 place-items-center rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-300">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </span>
+              <h3 class="mt-5 text-lg font-bold">Theme & language ready</h3>
+              <p class="muted mt-2 text-sm leading-relaxed">Light and dark themes plus built-in localisation, so the app feels native wherever you trade.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= Contracts ================= -->
+      <section id="contracts" class="section bg-neutral-50 dark:bg-night-900">
+        <div class="container-x">
+          <div class="max-w-2xl">
+            <span class="eyebrow" data-reveal>Contract types</span>
+            <h2 class="section-title mt-5" data-reveal>Pick the prediction that matches your read.</h2>
+            <p class="muted mt-5 text-lg leading-relaxed" data-reveal>
+              Each family targets the last digit of the tick price. Choose a digit, set your stake
+              and duration, and review the payout before you commit.
+            </p>
+          </div>
+
+          <div class="mt-14 grid gap-6 lg:grid-cols-3">
+            <article class="card-hover flex flex-col p-7" data-reveal>
+              <span class="inline-flex w-fit items-center rounded-full bg-gold/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-gold">Matches / Differs</span>
+              <h3 class="mt-5 text-xl font-bold">Match your digit</h3>
+              <p class="muted mt-2 text-sm leading-relaxed">Predict that the last digit will be exactly the number you choose — or that it will be anything else.</p>
+              <ul class="mt-6 space-y-3 text-sm">
+                <li class="flex items-start gap-2.5"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span>Win if the last digit equals your pick</span></li>
+                <li class="flex items-start gap-2.5"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span>Differs wins on every other digit</span></li>
+                <li class="flex items-start gap-2.5"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span>Live digit-frequency context</span></li>
+              </ul>
+            </article>
+
+            <article class="card-hover flex flex-col border-brand-500/40 p-7 dark:border-brand-400/40" data-reveal>
+              <span class="inline-flex w-fit items-center rounded-full bg-brand-500/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-300">Over / Under</span>
+              <h3 class="mt-5 text-xl font-bold">Set your threshold</h3>
+              <p class="muted mt-2 text-sm leading-relaxed">Choose whether the last digit will land strictly above or strictly below a threshold you set.</p>
+              <ul class="mt-6 space-y-3 text-sm">
+                <li class="flex items-start gap-2.5"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span>Thresholds from 1 to 8</span></li>
+                <li class="flex items-start gap-2.5"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span>Wider spreads, higher probability</span></li>
+                <li class="flex items-start gap-2.5"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span>Payout shown before you buy</span></li>
+              </ul>
+            </article>
+
+            <article class="card-hover flex flex-col p-7" data-reveal>
+              <span class="inline-flex w-fit items-center rounded-full bg-buy/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-buy">Even / Odd</span>
+              <h3 class="mt-5 text-xl font-bold">Keep it simple</h3>
+              <p class="muted mt-2 text-sm leading-relaxed">The cleanest read on the board: will the final digit be an even number or an odd one?</p>
+              <ul class="mt-6 space-y-3 text-sm">
+                <li class="flex items-start gap-2.5"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span>Two outcomes, one decision</span></li>
+                <li class="flex items-start gap-2.5"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span>No digit selection required</span></li>
+                <li class="flex items-start gap-2.5"><span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span>Fast to place, easy to follow</span></li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= How it works ================= -->
+      <section id="how" class="section">
+        <div class="container-x grid gap-14 lg:grid-cols-2 lg:items-center">
+          <div>
+            <span class="eyebrow" data-reveal>How it works</span>
+            <h2 class="section-title mt-5" data-reveal>From sign-in to first trade in under a minute.</h2>
+            <p class="muted mt-5 text-lg leading-relaxed" data-reveal>
+              No downloads, no setup wizards. Connect, choose, and place — the platform handles
+              the price streaming and contract pricing behind the scenes.
+            </p>
+
+            <ol class="mt-10 space-y-8">
+              <li class="flex gap-5" data-reveal>
+                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-500 text-sm font-bold text-white">1</span>
+                <div>
+                  <h3 class="font-bold">Connect your Deriv account</h3>
+                  <p class="muted mt-1 text-sm leading-relaxed">Sign in securely with OAuth, or open a free demo account to explore risk-free.</p>
+                </div>
+              </li>
+              <li class="flex gap-5" data-reveal>
+                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-500 text-sm font-bold text-white">2</span>
+                <div>
+                  <h3 class="font-bold">Choose a market and contract</h3>
+                  <p class="muted mt-1 text-sm leading-relaxed">Select a volatility index, pick a contract family, and set your predicted digit or threshold.</p>
+                </div>
+              </li>
+              <li class="flex gap-5" data-reveal>
+                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-500 text-sm font-bold text-white">3</span>
+                <div>
+                  <h3 class="font-bold">Set your stake and place the trade</h3>
+                  <p class="muted mt-1 text-sm leading-relaxed">Review the live payout, confirm your duration, and buy — then track the position from the same screen.</p>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <div class="card overflow-hidden p-6 shadow-lift sm:p-8" data-reveal>
+            <div class="flex items-center justify-between">
+              <p class="text-sm font-bold">Trade ticket</p>
+              <span class="rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-600 dark:bg-white/5 dark:text-neutral-300">Even / Odd</span>
+            </div>
+
+            <div class="mt-6 grid grid-cols-2 gap-3">
+              <button class="rounded-xl border-2 border-brand-500 bg-brand-500/10 py-3 text-sm font-bold text-brand-600 dark:text-brand-300">Even</button>
+              <button class="rounded-xl border border-neutral-200 py-3 text-sm font-semibold text-neutral-600 dark:border-white/10 dark:text-neutral-300">Odd</button>
+            </div>
+
+            <label class="mt-6 block text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Stake (USD)</label>
+            <div class="mt-2 flex items-center justify-between rounded-xl border border-neutral-200 px-4 py-3 dark:border-white/10">
+              <span class="font-mono text-lg font-bold tabular-nums">10.00</span>
+              <span class="flex gap-2">
+                <span class="grid h-7 w-7 place-items-center rounded-lg bg-neutral-100 text-neutral-500 dark:bg-white/5 dark:text-neutral-400">−</span>
+                <span class="grid h-7 w-7 place-items-center rounded-lg bg-neutral-100 text-neutral-500 dark:bg-white/5 dark:text-neutral-400">+</span>
+              </span>
+            </div>
+
+            <div class="mt-4 grid grid-cols-2 gap-3">
+              <div class="rounded-xl border border-neutral-200 px-4 py-3 dark:border-white/10">
+                <p class="text-[11px] uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Duration</p>
+                <p class="mt-1 font-mono text-sm font-bold">5 ticks</p>
+              </div>
+              <div class="rounded-xl border border-neutral-200 px-4 py-3 dark:border-white/10">
+                <p class="text-[11px] uppercase tracking-wider text-neutral-500 dark:text-neutral-400">Payout</p>
+                <p class="mt-1 font-mono text-sm font-bold text-buy">19.40 USD</p>
+              </div>
+            </div>
+
+            <div class="mt-5 flex items-center justify-between rounded-xl bg-neutral-50 px-4 py-3 text-sm dark:bg-white/5">
+              <span class="muted">Potential profit</span>
+              <span class="font-mono font-bold text-buy">+9.40 USD</span>
+            </div>
+
+            <button class="btn-primary mt-5 w-full bg-buy py-4 text-base hover:bg-buy/90">Buy Even</button>
+            <p class="mt-3 text-center text-[11px] text-neutral-400 dark:text-neutral-500">Illustrative interface preview.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= Why / stats ================= -->
+      <section class="section bg-neutral-50 dark:bg-night-900">
+        <div class="container-x">
+          <div class="grid gap-10 rounded-3xl border border-neutral-200 bg-white p-8 shadow-sm sm:p-12 dark:border-white/10 dark:bg-night-800 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+            <div>
+              <h2 class="section-title" data-reveal>Built for people who watch the numbers.</h2>
+              <p class="muted mt-5 text-lg leading-relaxed" data-reveal>
+                SirDigits is a white-label application layer on top of Deriv's proven trading
+                infrastructure. You get a clean, branded experience; Deriv handles execution,
+                accounts and settlement.
+              </p>
+              <ul class="mt-8 space-y-4">
+                <li class="flex items-start gap-3" data-reveal>
+                  <span class="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-500/15 text-brand-600 dark:text-brand-300">
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                  <span class="text-sm leading-relaxed">Independent demo and real accounts with one-click switching</span>
+                </li>
+                <li class="flex items-start gap-3" data-reveal>
+                  <span class="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-500/15 text-brand-600 dark:text-brand-300">
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                  <span class="text-sm leading-relaxed">Transparent payouts presented before every purchase</span>
+                </li>
+                <li class="flex items-start gap-3" data-reveal>
+                  <span class="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-500/15 text-brand-600 dark:text-brand-300">
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                  <span class="text-sm leading-relaxed">Positions tracked live, with a full history in reports</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 self-center">
+              <div class="card p-6 text-center" data-reveal>
+                <p class="text-3xl font-extrabold tracking-tight text-brand-500">1s</p>
+                <p class="muted mt-1 text-xs">Tick resolution</p>
+              </div>
+              <div class="card p-6 text-center" data-reveal>
+                <p class="text-3xl font-extrabold tracking-tight text-brand-500">1000</p>
+                <p class="muted mt-1 text-xs">Ticks analysed</p>
+              </div>
+              <div class="card p-6 text-center" data-reveal>
+                <p class="text-3xl font-extrabold tracking-tight text-brand-500">0.5s</p>
+                <p class="muted mt-1 text-xs">Quote refresh</p>
+              </div>
+              <div class="card p-6 text-center" data-reveal>
+                <p class="text-3xl font-extrabold tracking-tight text-brand-500">100%</p>
+                <p class="muted mt-1 text-xs">Browser based</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= FAQ ================= -->
+      <section id="faq" class="section">
+        <div class="container-x grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <span class="eyebrow" data-reveal>FAQ</span>
+            <h2 class="section-title mt-5" data-reveal>Questions, answered.</h2>
+            <p class="muted mt-5 text-base leading-relaxed" data-reveal>
+              Still unsure about something? Reach out and a member of the team will walk you
+              through the platform.
+            </p>
+          </div>
+
+          <div class="divide-y divide-neutral-200 dark:divide-white/10">
+            <details class="group py-5" data-reveal>
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-left font-semibold">
+                Is SirDigits a real trading platform?
+                <svg class="h-5 w-5 shrink-0 text-brand-500 transition-transform group-open:rotate-45" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </summary>
+              <p class="muted mt-3 text-sm leading-relaxed">Yes. SirDigits is a white-label application built on the Deriv WebSocket API. Trades are executed and settled through Deriv's trading infrastructure, so contract pricing and payouts follow Deriv's rules.</p>
+            </details>
+
+            <details class="group py-5" data-reveal>
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-left font-semibold">
+                Which markets can I trade?
+                <svg class="h-5 w-5 shrink-0 text-brand-500 transition-transform group-open:rotate-45" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </summary>
+              <p class="muted mt-3 text-sm leading-relaxed">Digit contracts are offered on synthetic volatility indices, which stream continuously around the clock, including 1-second variants for faster-paced sessions.</p>
+            </details>
+
+            <details class="group py-5" data-reveal>
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-left font-semibold">
+                Can I practise without risking money?
+                <svg class="h-5 w-5 shrink-0 text-brand-500 transition-transform group-open:rotate-45" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </summary>
+              <p class="muted mt-3 text-sm leading-relaxed">Absolutely. Every account comes with a demo balance, and you can switch between demo and real accounts instantly from the header without losing your session.</p>
+            </details>
+
+            <details class="group py-5" data-reveal>
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-left font-semibold">
+                Do I need to install anything?
+                <svg class="h-5 w-5 shrink-0 text-brand-500 transition-transform group-open:rotate-45" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </summary>
+              <p class="muted mt-3 text-sm leading-relaxed">No. SirDigits runs entirely in the browser on desktop, tablet and mobile. All you need is an internet connection and a Deriv account.</p>
+            </details>
+
+            <details class="group py-5" data-reveal>
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-left font-semibold">
+                Is there a risk of losing money?
+                <svg class="h-5 w-5 shrink-0 text-brand-500 transition-transform group-open:rotate-45" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </summary>
+              <p class="muted mt-3 text-sm leading-relaxed">Yes. Trading derivative contracts carries significant risk and you can lose your entire stake. Only trade with money you can afford to lose, and start with the demo account if you are new.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= CTA ================= -->
+      <section class="pb-24">
+        <div class="container-x">
+          <div class="relative overflow-hidden rounded-3xl bg-night px-8 py-16 text-center text-white sm:px-16 sm:py-20" data-reveal>
+            <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_120%_at_50%_0%,rgba(16,139,14,.5),transparent_60%)]" aria-hidden="true"></div>
+            <div class="relative">
+              <h2 class="mx-auto max-w-2xl text-balance text-3xl font-extrabold tracking-tight sm:text-4xl">
+                Ready to read the digits for yourself?
+              </h2>
+              <p class="mx-auto mt-5 max-w-xl text-base leading-relaxed text-neutral-300">
+                Open a free Deriv account through SirDigits and start with a demo balance — no
+                card, no commitment.
+              </p>
+              <div class="mt-8 flex flex-wrap justify-center gap-3">
+                <a href="https://t.deriv.link?t=SJDWRRPSERHY" class="btn-primary px-7 py-4 text-base">Create your free account</a>
+                <a href="#platform" class="btn rounded-full border border-white/20 px-7 py-4 text-base font-semibold text-white transition-colors hover:bg-white/10">Explore the platform</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ================= Footer ================= -->
+    <footer class="hairline bg-white dark:bg-night-900">
+      <div class="container-x py-14">
+        <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="sm:col-span-2 lg:col-span-1">
+            <a href="#" class="flex items-center gap-2.5" aria-label="SirDigits home">
+              <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand-500 text-white">
+                <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </span>
+              <span class="text-lg font-extrabold tracking-tight">Sir<span class="text-brand-500">Digits</span></span>
+            </a>
+            <p class="muted mt-4 max-w-xs text-sm leading-relaxed">
+              A white-label digit trading application powered by Deriv. Fast, focused and built
+              for the browser.
+            </p>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-bold">Product</h3>
+            <ul class="mt-4 space-y-3 text-sm">
+              <li><a class="muted transition-colors hover:text-brand-500" href="#platform">Platform</a></li>
+              <li><a class="muted transition-colors hover:text-brand-500" href="#contracts">Contracts</a></li>
+              <li><a class="muted transition-colors hover:text-brand-500" href="#how">How it works</a></li>
+              <li><a class="muted transition-colors hover:text-brand-500" href="#faq">FAQ</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-bold">Account</h3>
+            <ul class="mt-4 space-y-3 text-sm">
+              <li><a class="muted transition-colors hover:text-brand-500" href="https://app.deriv.com">Log in</a></li>
+              <li><a class="muted transition-colors hover:text-brand-500" href="https://t.deriv.link?t=SJDWRRPSERHY">Create account</a></li>
+              <li><a class="muted transition-colors hover:text-brand-500" href="https://developers.deriv.com">Deriv API</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-bold">Legal</h3>
+            <ul class="mt-4 space-y-3 text-sm">
+              <li><a class="muted transition-colors hover:text-brand-500" href="https://www.deriv.com/terms-and-conditions/">Terms &amp; conditions</a></li>
+              <li><a class="muted transition-colors hover:text-brand-500" href="https://www.deriv.com/regulatory/">Regulatory information</a></li>
+              <li><a class="muted transition-colors hover:text-brand-500" href="https://www.deriv.com/risk-disclaimer/">Risk disclaimer</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mt-12 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 dark:border-white/10 dark:bg-white/5">
+          <p class="text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
+            <strong class="font-semibold text-neutral-700 dark:text-neutral-300">Risk warning:</strong>
+            Trading derivative products involves a high level of risk and can result in the loss
+            of all your invested capital. These products may not be suitable for everyone. You
+            should not trade money you cannot afford to lose. This page is for informational
+            purposes only and does not constitute financial advice.
+          </p>
+        </div>
+
+        <div class="mt-8 flex flex-col items-center justify-between gap-3 sm:flex-row">
+          <p class="text-xs text-neutral-500 dark:text-neutral-400">© <span id="year">2026</span> SirDigits. All rights reserved.</p>
+          <p class="text-xs text-neutral-500 dark:text-neutral-400">Powered by <span class="font-semibold text-neutral-900 dark:text-white">Deriv</span></p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="/assets/app.js" defer></script>
+  </body>
+</html>

@@ -1,5 +1,10 @@
+# Standalone static landing page (plain HTML + compiled Tailwind).
+# No Next.js build is required to publish it, so skip the auto-installed
+# Next.js runtime plugin (which otherwise validates the publish directory
+# as Next.js build output and fails).
 [build]
-  command = "npm run build"
+  command = "echo \"Static landing page — no build step required\""
+  publish = "landing"
 
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+[build.environment]
+  NETLIFY_NEXT_PLUGIN_SKIP = "true"
