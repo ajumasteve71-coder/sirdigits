@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://sirdigits.netlify.app/sitemap.xml
