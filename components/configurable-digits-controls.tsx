@@ -22,7 +22,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { GripVertical, LineChart } from 'lucide-react';
-import { toast } from 'sonner';
 import { Localize } from '@deriv-com/translations';
 import { useRearrangeDrag } from '@/hooks/use-rearrange-drag';
 import { Button } from '@/components/ui/button';
@@ -44,13 +43,7 @@ import { SymbolSelector } from '@/components/custom/symbol-selector';
 import { useAppTranslations } from '@/components/custom/i18n-provider';
 import { getSubmarketDisplayName } from '@/lib/active-symbols-display-names';
 import { cn } from '@/lib/utils';
-import type {
-  ActiveSymbol,
-  Tick,
-  ProposalInfo,
-  DurationLimits,
-  BuyResult,
-} from '@deriv/core';
+import type { ActiveSymbol, Tick, ProposalInfo, DurationLimits } from '@deriv/core';
 import { CurrentTickDisplay } from './current-tick-display';
 import { DigitStatsBar } from './digit-stats-bar';
 import type { ContractMode, TradeType, DigitStats } from '../lib/types';
@@ -218,9 +211,6 @@ export interface ConfigurableDigitsControlsProps {
   isProposalLoading: boolean;
   onBuy: () => void;
   isBuying: boolean;
-  buyResult: BuyResult | null;
-  buyError: string | null;
-  onClearBuyResult: () => void;
   isConnected: boolean;
   isAuthenticated?: boolean;
 
@@ -240,6 +230,18 @@ export interface ConfigurableDigitsControlsProps {
    * pinned button has no position to drag.
    */
   pinBuy?: boolean;
+  /**
+   * Render only these blocks, still in the configured order. The desktop
+   * no-code layout splits the single ordered column into a market-data column
+   * and a controls column — each column is one filtered instance. Omit to
+   * render every block.
+   */
+  keys?: ControlKey[];
+  /**
+   * Hide the "View your positions" link. When the desktop layout splits into
+   * two columns only the controls column keeps the link, so it renders once.
+   */
+  showPositionsLink?: boolean;
 }
 
 export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProps) {
@@ -267,9 +269,6 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
     isProposalLoading,
     onBuy,
     isBuying,
-    buyResult,
-    buyError,
-    onClearBuyResult,
     isConnected,
     isAuthenticated,
     editMode,
@@ -278,6 +277,8 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
     rearrangeMode,
     onReorder,
     pinBuy,
+    keys,
+    showPositionsLink = true,
   } = props;
 
   const { localize } = useAppTranslations();
@@ -304,28 +305,6 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, [editMode, selectedKey]);
 
-  useEffect(() => {
-    if (buyError) {
-      toast.error(localize('Purchase Failed'), { description: buyError });
-      onClearBuyResult();
-    }
-  }, [buyError, onClearBuyResult, localize]);
-  useEffect(() => {
-    if (buyResult) {
-      toast.success(localize('Contract Purchased'), {
-        description: localize(
-          'Buy price: {{buyPrice}} USD | Payout: {{payout}} USD | Balance: {{balance}} USD',
-          {
-            buyPrice: buyResult.buyPrice.toFixed(2),
-            payout: buyResult.payout.toFixed(2),
-            balance: buyResult.balanceAfter.toFixed(2),
-          }
-        ),
-      });
-      onClearBuyResult();
-    }
-  }, [buyResult, onClearBuyResult, localize]);
-
   // ── Trade type (3 styles) ───────────────────────────────────────────────
   // Real control = TradeTypeChips. Each variant calls onTradeTypeChange (which
   // keeps the setTradeType behaviour — it resets contract mode upstream).
@@ -333,13 +312,14 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
     const variants: Record<StyleVariant, () => React.ReactNode> = {
       // a — pill chips (current)
       a: () => (
-        <div className="overflow-x-auto pb-0.5 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-          <TradeTypeChips
-            value={tradeType}
-            options={digitTradeTypeOptions}
-            onValueChange={onTradeTypeChange}
-          />
-        </div>
+        // Rendered inside the controls card, so the edge fade is drawn in the
+        // card colour rather than the page background.
+        <TradeTypeChips
+          backdrop="card"
+          value={tradeType}
+          options={digitTradeTypeOptions}
+          onValueChange={onTradeTypeChange}
+        />
       ),
       // Segmented — <ToggleGroup> styled like a segmented control.
       b: () => (
@@ -910,12 +890,16 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
     buy: renderBuy,
   };
 
+  // Filtering config.order (not iterating `keys`) keeps the configured
+  // relative order authoritative inside a filtered column.
+  const orderedKeys = keys ? config.order.filter((key) => keys.includes(key)) : config.order;
+
   if (editMode && rearrangeMode) {
     // Rearrange mode: every block is draggable. Inner content is inert so
     // dragging never triggers a control.
     return (
       <div className="w-full space-y-2">
-        {config.order.map((key) => {
+        {orderedKeys.map((key) => {
           const content = renderers[key]();
           if (content === null) return null;
           const dragging = rearrange.draggingKey === key;
@@ -961,7 +945,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
     // Each block is selectable: clicking opens its accordion in the dashboard.
     return (
       <div className="w-full space-y-3">
-        {config.order.map((key) => {
+        {orderedKeys.map((key) => {
           const content = renderers[key]();
           if (content === null) return null;
           const selected = selectedKey === key;
@@ -1003,12 +987,12 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
 
   return (
     <div className="w-full space-y-3 lg:space-y-4">
-      {config.order.map((key) => {
+      {orderedKeys.map((key) => {
         const content = renderers[key]();
         if (content === null) return null;
         return <div key={key}>{content}</div>;
       })}
-      {isAuthenticated && (
+      {isAuthenticated && showPositionsLink && (
         <Button asChild variant="ghost" className="w-full text-sm text-muted-foreground hover:text-foreground">
           <Link href="/reports">
             <Localize i18n_default_text="View your positions →" />

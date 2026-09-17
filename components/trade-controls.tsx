@@ -37,6 +37,13 @@ interface TradeControlsProps {
   buyError: string | null;
   onClearBuyResult: () => void;
   isAuthenticated?: boolean;
+  /**
+   * Pins the Buy button above the footer (fixed) instead of inline. Driven by
+   * the same useIsMobile state that picks the view's layout branch — a CSS
+   * breakpoint here could disagree with the mounted branch during the
+   * first-paint window, where useIsMobile is still false on every viewport.
+   */
+  isMobile?: boolean;
 }
 
 function getContractModeOptions(
@@ -101,6 +108,7 @@ export function TradeControls({
   buyError,
   onClearBuyResult,
   isAuthenticated,
+  isMobile,
 }: TradeControlsProps) {
   const { localize } = useAppTranslations();
 
@@ -223,7 +231,13 @@ export function TradeControls({
       </div>
 
       {/* Buy button — fixed above footer on mobile, inline on desktop */}
-      <div className="max-lg:fixed max-lg:bottom-[calc(env(safe-area-inset-bottom)+2.5rem)] max-lg:left-3 max-lg:right-3 lg:static">
+      <div
+        className={
+          isMobile
+            ? 'fixed bottom-[calc(env(safe-area-inset-bottom)+2.5rem)] left-3 right-3'
+            : undefined
+        }
+      >
         <Button
           className="w-full h-10 rounded-full px-6 sm:h-11 sm:px-8"
           disabled={!isConnected || !proposal || isBuying}
